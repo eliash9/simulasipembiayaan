@@ -312,15 +312,21 @@
             let remainingPrincipal = principal;
 
             for (let month = 1; month <= tenor; month++) {
-                // Gunakan nilai yang sudah dibulatkan untuk konsistensi
-                remainingPrincipal -= roundedMonthlyPrincipal;
+                let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                
+                // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
+                if (month === tenor) {
+                    currentMonthlyPrincipal = remainingPrincipal;
+                }
+                
+                remainingPrincipal -= currentMonthlyPrincipal;
                 
                 schedule.push({
                     month: month,
                     payment: monthlyPayment,
-                    principal: roundedMonthlyPrincipal,
+                    principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
-                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                    remaining: Math.max(0, remainingPrincipal)
                 });
             }
 
@@ -347,21 +353,26 @@
 
             for (let month = 1; month <= tenor; month++) {
                 const monthlyMargin = remainingPrincipal * monthlyRate;
-                const monthlyPrincipal = monthlyPayment - monthlyMargin;
+                let monthlyPrincipal = monthlyPayment - monthlyMargin;
+                
+                // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
+                if (month === tenor) {
+                    monthlyPrincipal = remainingPrincipal;
+                }
                 
                 // Bulatkan komponen individual
                 const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
                 const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
                 
-                remainingPrincipal -= roundedMonthlyPrincipal;
+                remainingPrincipal -= monthlyPrincipal;
                 totalMargin += monthlyMargin;
 
                 schedule.push({
                     month: month,
                     payment: monthlyPayment,
-                    principal: roundedMonthlyPrincipal,
+                    principal: month === tenor ? monthlyPrincipal : roundedMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
-                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                    remaining: Math.max(0, remainingPrincipal)
                 });
             }
 
@@ -382,22 +393,29 @@
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
 
             for (let month = 1; month <= tenor; month++) {
+                let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                
+                // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
+                if (month === tenor) {
+                    currentMonthlyPrincipal = remainingPrincipal;
+                }
+                
                 const monthlyMargin = remainingPrincipal * monthlyRate;
-                let monthlyPayment = roundedMonthlyPrincipal + monthlyMargin;
+                let monthlyPayment = currentMonthlyPrincipal + monthlyMargin;
                 
                 // Terapkan pembulatan per angsuran
                 monthlyPayment = roundAmount(monthlyPayment, roundingType);
                 const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
                 
-                remainingPrincipal -= roundedMonthlyPrincipal;
+                remainingPrincipal -= currentMonthlyPrincipal;
                 totalMargin += monthlyMargin;
 
                 schedule.push({
                     month: month,
                     payment: monthlyPayment,
-                    principal: roundedMonthlyPrincipal,
+                    principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
-                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                    remaining: Math.max(0, remainingPrincipal)
                 });
             }
 
@@ -432,14 +450,21 @@
             const roundedMonthlyMargin = roundAmount(monthlyMarginPayment, roundingType);
 
             for (let month = 1; month <= tenor; month++) {
-                remainingPrincipal -= roundedMonthlyPrincipal;
+                let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                
+                // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
+                if (month === tenor) {
+                    currentMonthlyPrincipal = remainingPrincipal;
+                }
+                
+                remainingPrincipal -= currentMonthlyPrincipal;
                 
                 schedule.push({
                     month: month,
                     payment: monthlyPayment,
-                    principal: roundedMonthlyPrincipal,
+                    principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
-                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                    remaining: Math.max(0, remainingPrincipal)
                 });
             }
 
@@ -470,7 +495,7 @@
                     payment: monthlyRent,
                     principal: 0, // Dalam ijarah, tidak ada pembayaran pokok
                     margin: monthlyRent,
-                    remaining: roundAmount(principal, roundingType) // Aset masih milik bank hingga akhir
+                    remaining: month === tenor ? 0 : roundAmount(principal, roundingType) // Aset dibeli di akhir
                 });
             }
 
@@ -491,22 +516,29 @@
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipalBuyout, roundingType);
 
             for (let month = 1; month <= tenor; month++) {
+                let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                
+                // Pada angsuran terakhir, gunakan sisa kepemilikan bank sebagai pokok
+                if (month === tenor) {
+                    currentMonthlyPrincipal = bankOwnership;
+                }
+                
                 const monthlyRent = bankOwnership * monthlyRate;
-                let monthlyPayment = roundedMonthlyPrincipal + monthlyRent;
+                let monthlyPayment = currentMonthlyPrincipal + monthlyRent;
                 
                 // Terapkan pembulatan per angsuran
                 monthlyPayment = roundAmount(monthlyPayment, roundingType);
                 const roundedMonthlyRent = roundAmount(monthlyRent, roundingType);
                 
-                bankOwnership -= roundedMonthlyPrincipal;
+                bankOwnership -= currentMonthlyPrincipal;
                 totalMargin += monthlyRent;
 
                 schedule.push({
                     month: month,
                     payment: monthlyPayment,
-                    principal: roundedMonthlyPrincipal,
+                    principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyRent,
-                    remaining: Math.max(0, roundAmount(bankOwnership, roundingType))
+                    remaining: Math.max(0, bankOwnership)
                 });
             }
 
