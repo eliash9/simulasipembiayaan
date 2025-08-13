@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulasi Pembiayaan Syariah</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <!-- Contoh: -->
+    <link rel="manifest" href="/simulasipembiayaan/manifest.json">
+    <link rel="icon" href="/simulasipembiayaan/icons/icon-192x192.png">
+     <link rel="apple-touch-icon" href="/simulasipembiayaan/icons/icon-192x192.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -617,16 +619,12 @@
 
         // PWA Installation
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+            navigator.serviceWorker.register('/simulasipembiayaan/sw.js', { 
+                scope: '/simulasipembiayaan/' 
+            }).then(registration => {
+                console.log('ServiceWorker registered dengan scope:', registration.scope);
             });
-        }
+            }
 
         // Install Prompt
         let deferredPrompt;

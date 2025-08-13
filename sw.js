@@ -1,9 +1,12 @@
 const CACHE_NAME = 'simulasi-pembiayaan-v1';
+const BASE_PATH = '/simulasipembiayaan/';
 const urlsToCache = [
-  '/simulasipembiayaan',
-  '/index.html',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  BASE_PATH,
+  BASE_PATH + 'index.html',
+  BASE_PATH + 'styles/main.css',
+  BASE_PATH + 'scripts/main.js',
+  BASE_PATH + 'icons/icon-192x192.png',
+  BASE_PATH + 'icons/icon-512x512.png',
 ];
 
 self.addEventListener('install', event => {
