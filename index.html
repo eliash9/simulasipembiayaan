@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Pembiayaan Syariah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'islamic-green': '#2d7d32',
+                        'islamic-gold': '#ffc107',
+                        'islamic-light-green': '#66bb6a'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-green-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-islamic-green text-white py-4 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-xl sm:text-2xl font-bold text-center">
+                <span class="text-islamic-gold">🕌</span> Simulasi Pembiayaan Syariah
+            </h1>
+            <p class="text-center text-green-100 text-sm mt-1">Kalkulator Angsuran Berbasis Prinsip Syariah</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 max-w-4xl">
+        <!-- Form Input -->
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-islamic-green mb-4 border-b-2 border-islamic-gold pb-2">
+                Data Pembiayaan
+            </h2>
+            
+            <!-- Metode Perhitungan -->
+            <div class="mb-4">
+                <label for="method" class="block text-sm font-medium text-gray-700 mb-2">
+                    Metode Perhitungan Angsuran
+                </label>
+                <select id="method" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                    <option value="flat">Flat (Rate Tetap)</option>
+                    <option value="anuitas">Anuitas (Angsuran Tetap)</option>
+                    <option value="efektif">Efektif (Rate Menurun)</option>
+                    <option value="murabahah">Murabahah (Jual Beli)</option>
+                    <option value="ijarah">Ijarah (Sewa)</option>
+                    <option value="mmq">Musyarakah Mutanaqisah (MMQ)</option>
+                </select>
+            </div>
+
+            <!-- Input Fields Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
+                        Harga Barang/Properti (Rp)
+                    </label>
+                    <input type="number" id="price" placeholder="100000000" 
+                           class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                </div>
+                
+                <div>
+                    <label for="downPayment" class="block text-sm font-medium text-gray-700 mb-2">
+                        Uang Muka / DP (Rp)
+                    </label>
+                    <input type="number" id="downPayment" placeholder="20000000"
+                           class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                </div>
+                
+                <div>
+                    <label for="tenor" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tenor (Bulan)
+                    </label>
+                    <input type="number" id="tenor" placeholder="60" min="1" max="360"
+                           class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                </div>
+                
+                <div>
+                    <label for="rate" class="block text-sm font-medium text-gray-700 mb-2">
+                        Margin/Profit Rate (% per tahun)
+                    </label>
+                    <input type="number" id="rate" placeholder="12" step="0.1" min="0" max="50"
+                           class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                </div>
+            </div>
+
+            <!-- Opsi Tambahan -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="rounding" class="block text-sm font-medium text-gray-700 mb-2">
+                        Pembulatan Angsuran
+                    </label>
+                    <select id="rounding" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+                        <option value="none">Tanpa Pembulatan</option>
+                        <option value="hundred">Pembulatan Ratusan</option>
+                        <option value="thousand" selected>Pembulatan Ribuan</option>
+                        <option value="tenthousand">Pembulatan Puluh Ribu</option>
+                        <option value="hundredthousand">Pembulatan Ratus Ribu</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="showMonthlyRate" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tampilkan Rate per Bulan
+                    </label>
+                    <div class="flex items-center mt-3">
+                        <input type="checkbox" id="showMonthlyRate" checked
+                               class="w-4 h-4 text-islamic-green bg-gray-100 border-gray-300 rounded focus:ring-islamic-green focus:ring-2">
+                        <label for="showMonthlyRate" class="ml-2 text-sm text-gray-700">
+                            Ya, tampilkan rate bulanan dalam hasil
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biaya Administrasi -->
+            <div class="mb-6">
+                <label for="adminFee" class="block text-sm font-medium text-gray-700 mb-2">
+                    Biaya Administrasi (Rp) - Opsional
+                </label>
+                <input type="number" id="adminFee" placeholder="0"
+                       class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-islamic-green focus:border-islamic-green">
+            </div>
+
+            <!-- Tombol Hitung -->
+            <button onclick="calculateFinancing()" 
+                    class="w-full bg-islamic-green hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300 shadow-lg">
+                <span class="text-lg">🧮</span> Hitung Simulasi Pembiayaan
+            </button>
+        </div>
+
+        <!-- Hasil Perhitungan -->
+        <div id="results" class="hidden bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6">
+            <h3 class="text-lg sm:text-xl font-semibold text-islamic-green mb-4 border-b-2 border-islamic-gold pb-2">
+                Hasil Simulasi
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-green-50 p-4 rounded-lg border border-islamic-light-green">
+                    <h4 class="font-semibold text-gray-700 text-sm">Angsuran per Bulan</h4>
+                    <p id="monthlyPayment" class="text-xl font-bold text-islamic-green"></p>
+                </div>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg border border-islamic-gold">
+                    <h4 class="font-semibold text-gray-700 text-sm">Total Pembayaran</h4>
+                    <p id="totalPayment" class="text-xl font-bold text-islamic-gold"></p>
+                </div>
+                
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-300">
+                    <h4 class="font-semibold text-gray-700 text-sm">Total Margin/Keuntungan</h4>
+                    <p id="totalProfit" class="text-xl font-bold text-blue-600"></p>
+                </div>
+                
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-300">
+                    <h4 class="font-semibold text-gray-700 text-sm">Pokok Pinjaman</h4>
+                    <p id="principalAmount" class="text-xl font-bold text-purple-600"></p>
+                </div>
+            </div>
+
+            <!-- Rate Information -->
+            <div id="rateInfo" class="bg-orange-50 p-4 rounded-lg border border-orange-300 mb-6 hidden">
+                <h4 class="font-semibold text-gray-700 text-sm mb-2">Informasi Rate</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Rate Tahunan:</span>
+                        <span id="annualRate" class="font-bold text-orange-600 ml-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Rate per Bulan:</span>
+                        <span id="monthlyRateDisplay" class="font-bold text-orange-600 ml-1"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jadwal Angsuran -->
+        <div id="scheduleContainer" class="hidden bg-white rounded-lg shadow-lg p-4 sm:p-6">
+            <h3 class="text-lg sm:text-xl font-semibold text-islamic-green mb-4 border-b-2 border-islamic-gold pb-2">
+                Jadwal Angsuran
+            </h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-islamic-green text-white">
+                        <tr>
+                            <th class="p-3 text-left">Bulan</th>
+                            <th class="p-3 text-right">Angsuran</th>
+                            <th class="p-3 text-right">Pokok</th>
+                            <th class="p-3 text-right">Margin</th>
+                            <th class="p-3 text-right">Sisa Pokok</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTable" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-islamic-green text-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">&copy; 2025 Simulasi Pembiayaan Syariah - Untuk Keperluan Edukasi</p>
+            <p class="text-xs text-green-200 mt-1">Konsultasikan dengan ahli keuangan syariah untuk keputusan final</p>
+        </div>
+    </footer>
+
+    <script>
+        // Fungsi untuk pembulatan ke atas sesuai pilihan user
+        function roundAmount(amount, roundingType) {
+            switch(roundingType) {
+                case 'hundred':
+                    return Math.ceil(amount / 100) * 100;
+                case 'thousand':
+                    return Math.ceil(amount / 1000) * 1000;
+                case 'tenthousand':
+                    return Math.ceil(amount / 10000) * 10000;
+                case 'hundredthousand':
+                    return Math.ceil(amount / 100000) * 100000;
+                default:
+                    return amount;
+            }
+        }
+
+        // Fungsi untuk format currency Indonesia
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Fungsi untuk format angka
+        function formatNumber(num) {
+            return new Intl.NumberFormat('id-ID').format(num);
+        }
+
+        // Fungsi utama untuk menghitung pembiayaan
+        function calculateFinancing() {
+            // Ambil nilai input
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+            const tenor = parseInt(document.getElementById('tenor').value) || 0;
+            const annualRate = parseFloat(document.getElementById('rate').value) || 0;
+            const adminFee = parseFloat(document.getElementById('adminFee').value) || 0;
+            const method = document.getElementById('method').value;
+            const roundingType = document.getElementById('rounding').value;
+            const showMonthlyRate = document.getElementById('showMonthlyRate').checked;
+
+            // Validasi input
+            if (price <= 0 || tenor <= 0 || annualRate < 0) {
+                alert('Mohon lengkapi data dengan benar!');
+                return;
+            }
+
+            if (downPayment >= price) {
+                alert('Uang muka tidak boleh lebih besar atau sama dengan harga barang!');
+                return;
+            }
+
+            // Hitung pokok pinjaman
+            const principal = price - downPayment;
+            const monthlyRate = annualRate / 100 / 12;
+
+            let result = {};
+
+            // Perhitungan berdasarkan metode yang dipilih
+            switch(method) {
+                case 'flat':
+                    result = calculateFlat(principal, annualRate, tenor, adminFee, roundingType);
+                    break;
+                case 'anuitas':
+                    result = calculateAnuitas(principal, monthlyRate, tenor, adminFee, roundingType);
+                    break;
+                case 'efektif':
+                    result = calculateEfektif(principal, monthlyRate, tenor, adminFee, roundingType);
+                    break;
+                case 'murabahah':
+                    result = calculateMurabahah(principal, annualRate, tenor, adminFee, roundingType);
+                    break;
+                case 'ijarah':
+                    result = calculateIjarah(principal, annualRate, tenor, adminFee, roundingType);
+                    break;
+                case 'mmq':
+                    result = calculateMMQ(principal, monthlyRate, tenor, adminFee, roundingType);
+                    break;
+            }
+
+            // Tampilkan hasil
+            displayResults(result, principal, annualRate, monthlyRate, showMonthlyRate);
+        }
+
+        // METODE FLAT: Rate tetap terhadap pokok awal
+        function calculateFlat(principal, annualRate, tenor, adminFee, roundingType = 'none') {
+            const monthlyPrincipal = principal / tenor;
+            const monthlyMargin = (principal * annualRate / 100) / 12;
+            let monthlyPayment = monthlyPrincipal + monthlyMargin;
+            
+            // Terapkan pembulatan
+            monthlyPayment = roundAmount(monthlyPayment, roundingType);
+            const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
+            const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
+            
+            const totalPayment = monthlyPayment * tenor + adminFee;
+            const totalMargin = monthlyMargin * tenor;
+
+            const schedule = [];
+            let remainingPrincipal = principal;
+
+            for (let month = 1; month <= tenor; month++) {
+                // Gunakan nilai yang sudah dibulatkan untuk konsistensi
+                remainingPrincipal -= roundedMonthlyPrincipal;
+                
+                schedule.push({
+                    month: month,
+                    payment: monthlyPayment,
+                    principal: roundedMonthlyPrincipal,
+                    margin: roundedMonthlyMargin,
+                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                });
+            }
+
+            return {
+                monthlyPayment,
+                totalPayment,
+                totalMargin,
+                schedule
+            };
+        }
+
+        // METODE ANUITAS: Angsuran tetap, komposisi pokok dan bunga berubah
+        function calculateAnuitas(principal, monthlyRate, tenor, adminFee, roundingType = 'none') {
+            let monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, tenor)) / (Math.pow(1 + monthlyRate, tenor) - 1);
+            
+            // Terapkan pembulatan
+            monthlyPayment = roundAmount(monthlyPayment, roundingType);
+            
+            const totalPayment = monthlyPayment * tenor + adminFee;
+
+            const schedule = [];
+            let remainingPrincipal = principal;
+            let totalMargin = 0;
+
+            for (let month = 1; month <= tenor; month++) {
+                const monthlyMargin = remainingPrincipal * monthlyRate;
+                const monthlyPrincipal = monthlyPayment - monthlyMargin;
+                
+                // Bulatkan komponen individual
+                const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
+                const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
+                
+                remainingPrincipal -= roundedMonthlyPrincipal;
+                totalMargin += monthlyMargin;
+
+                schedule.push({
+                    month: month,
+                    payment: monthlyPayment,
+                    principal: roundedMonthlyPrincipal,
+                    margin: roundedMonthlyMargin,
+                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                });
+            }
+
+            return {
+                monthlyPayment,
+                totalPayment,
+                totalMargin,
+                schedule
+            };
+        }
+
+        // METODE EFEKTIF: Rate efektif terhadap sisa pokok
+        function calculateEfektif(principal, monthlyRate, tenor, adminFee, roundingType = 'none') {
+            const schedule = [];
+            let remainingPrincipal = principal;
+            let totalMargin = 0;
+            const monthlyPrincipal = principal / tenor;
+            const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
+
+            for (let month = 1; month <= tenor; month++) {
+                const monthlyMargin = remainingPrincipal * monthlyRate;
+                let monthlyPayment = roundedMonthlyPrincipal + monthlyMargin;
+                
+                // Terapkan pembulatan per angsuran
+                monthlyPayment = roundAmount(monthlyPayment, roundingType);
+                const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
+                
+                remainingPrincipal -= roundedMonthlyPrincipal;
+                totalMargin += monthlyMargin;
+
+                schedule.push({
+                    month: month,
+                    payment: monthlyPayment,
+                    principal: roundedMonthlyPrincipal,
+                    margin: roundedMonthlyMargin,
+                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                });
+            }
+
+            const averageMonthlyPayment = (principal + totalMargin) / tenor;
+            const totalPayment = principal + totalMargin + adminFee;
+
+            return {
+                monthlyPayment: roundAmount(averageMonthlyPayment, roundingType),
+                totalPayment,
+                totalMargin,
+                schedule
+            };
+        }
+
+        // METODE MURABAHAH: Jual beli dengan margin keuntungan tetap
+        function calculateMurabahah(principal, annualRate, tenor, adminFee, roundingType = 'none') {
+            const totalMargin = principal * (annualRate / 100) * (tenor / 12);
+            const totalAmount = principal + totalMargin;
+            let monthlyPayment = totalAmount / tenor;
+            
+            // Terapkan pembulatan
+            monthlyPayment = roundAmount(monthlyPayment, roundingType);
+            
+            const totalPayment = totalAmount + adminFee;
+
+            const schedule = [];
+            let remainingPrincipal = principal;
+            const monthlyPrincipalPayment = principal / tenor;
+            const monthlyMarginPayment = totalMargin / tenor;
+            
+            const roundedMonthlyPrincipal = roundAmount(monthlyPrincipalPayment, roundingType);
+            const roundedMonthlyMargin = roundAmount(monthlyMarginPayment, roundingType);
+
+            for (let month = 1; month <= tenor; month++) {
+                remainingPrincipal -= roundedMonthlyPrincipal;
+                
+                schedule.push({
+                    month: month,
+                    payment: monthlyPayment,
+                    principal: roundedMonthlyPrincipal,
+                    margin: roundedMonthlyMargin,
+                    remaining: Math.max(0, roundAmount(remainingPrincipal, roundingType))
+                });
+            }
+
+            return {
+                monthlyPayment,
+                totalPayment,
+                totalMargin,
+                schedule
+            };
+        }
+
+        // METODE IJARAH: Pembayaran sewa dengan opsi beli
+        function calculateIjarah(principal, annualRate, tenor, adminFee, roundingType = 'none') {
+            // Dalam Ijarah, pembayaran adalah sewa bulanan
+            let monthlyRent = (principal * annualRate / 100) / 12;
+            
+            // Terapkan pembulatan
+            monthlyRent = roundAmount(monthlyRent, roundingType);
+            
+            const totalRent = monthlyRent * tenor;
+            const totalPayment = totalRent + adminFee;
+
+            const schedule = [];
+            
+            for (let month = 1; month <= tenor; month++) {
+                schedule.push({
+                    month: month,
+                    payment: monthlyRent,
+                    principal: 0, // Dalam ijarah, tidak ada pembayaran pokok
+                    margin: monthlyRent,
+                    remaining: roundAmount(principal, roundingType) // Aset masih milik bank hingga akhir
+                });
+            }
+
+            return {
+                monthlyPayment: monthlyRent,
+                totalPayment,
+                totalMargin: totalRent,
+                schedule
+            };
+        }
+
+        // METODE MUSYARAKAH MUTANAQISAH (MMQ): Kemitraan dengan pengurangan kepemilikan bank
+        function calculateMMQ(principal, monthlyRate, tenor, adminFee, roundingType = 'none') {
+            const schedule = [];
+            let bankOwnership = principal;
+            let totalMargin = 0;
+            const monthlyPrincipalBuyout = principal / tenor;
+            const roundedMonthlyPrincipal = roundAmount(monthlyPrincipalBuyout, roundingType);
+
+            for (let month = 1; month <= tenor; month++) {
+                const monthlyRent = bankOwnership * monthlyRate;
+                let monthlyPayment = roundedMonthlyPrincipal + monthlyRent;
+                
+                // Terapkan pembulatan per angsuran
+                monthlyPayment = roundAmount(monthlyPayment, roundingType);
+                const roundedMonthlyRent = roundAmount(monthlyRent, roundingType);
+                
+                bankOwnership -= roundedMonthlyPrincipal;
+                totalMargin += monthlyRent;
+
+                schedule.push({
+                    month: month,
+                    payment: monthlyPayment,
+                    principal: roundedMonthlyPrincipal,
+                    margin: roundedMonthlyRent,
+                    remaining: Math.max(0, roundAmount(bankOwnership, roundingType))
+                });
+            }
+
+            const totalPayment = principal + totalMargin + adminFee;
+            const averageMonthlyPayment = roundAmount((principal + totalMargin) / tenor, roundingType);
+
+            return {
+                monthlyPayment: averageMonthlyPayment,
+                totalPayment,
+                totalMargin,
+                schedule
+            };
+        }
+
+        // Fungsi untuk menampilkan hasil
+        function displayResults(result, principal, annualRate, monthlyRate, showMonthlyRate) {
+            // Tampilkan ringkasan hasil
+            document.getElementById('monthlyPayment').textContent = formatCurrency(result.monthlyPayment);
+            document.getElementById('totalPayment').textContent = formatCurrency(result.totalPayment);
+            document.getElementById('totalProfit').textContent = formatCurrency(result.totalMargin);
+            document.getElementById('principalAmount').textContent = formatCurrency(principal);
+
+            // Tampilkan informasi rate jika diminta
+            if (showMonthlyRate) {
+                document.getElementById('annualRate').textContent = annualRate.toFixed(2) + '%';
+                document.getElementById('monthlyRateDisplay').textContent = (monthlyRate * 100).toFixed(4) + '%';
+                document.getElementById('rateInfo').classList.remove('hidden');
+            } else {
+                document.getElementById('rateInfo').classList.add('hidden');
+            }
+
+            // Tampilkan jadwal angsuran
+            const scheduleTable = document.getElementById('scheduleTable');
+            scheduleTable.innerHTML = '';
+
+            result.schedule.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3 font-medium">${item.month}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.payment)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.principal)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.margin)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.remaining)}</td>
+                `;
+                scheduleTable.appendChild(row);
+            });
+
+            // Tampilkan section hasil
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('scheduleContainer').classList.remove('hidden');
+
+            // Scroll ke hasil
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }d('monthlyPayment').textContent = formatCurrency(result.monthlyPayment);
+            document.getElementById('totalPayment').textContent = formatCurrency(result.totalPayment);
+            document.getElementById('totalProfit').textContent = formatCurrency(result.totalMargin);
+            document.getElementById('principalAmount').textContent = formatCurrency(principal);
+
+            // Tampilkan jadwal angsuran
+            const scheduleTable = document.getElementById('scheduleTable');
+            scheduleTable.innerHTML = '';
+
+            result.schedule.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3 font-medium">${item.month}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.payment)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.principal)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.margin)}</td>
+                    <td class="p-3 text-right">${formatCurrency(item.remaining)}</td>
+                `;
+                scheduleTable.appendChild(row);
+            });
+
+            // Tampilkan section hasil
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('scheduleContainer').classList.remove('hidden');
+
+            // Scroll ke hasil
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+       // }
+
+        // Auto-fill contoh data saat halaman dimuat
+        window.addEventListener('load', function() {
+            document.getElementById('price').value = '500000000';
+            document.getElementById('downPayment').value = '100000000';
+            document.getElementById('tenor').value = '120';
+            document.getElementById('rate').value = '10.5';
+            document.getElementById('adminFee').value = '2500000';
+        });
+    </script>
+</body>
+</html>
