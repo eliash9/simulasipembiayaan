@@ -305,25 +305,28 @@
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
             const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
             
-            const totalPayment = monthlyPayment * tenor + adminFee;
-            const totalMargin = monthlyMargin * tenor;
-
             const schedule = [];
             let remainingPrincipal = principal;
+            let totalActualPayment = 0;
+            let totalMargin = 0;
 
             for (let month = 1; month <= tenor; month++) {
                 let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                let currentPayment = monthlyPayment;
                 
                 // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
                 if (month === tenor) {
                     currentMonthlyPrincipal = remainingPrincipal;
+                    currentPayment = currentMonthlyPrincipal + roundedMonthlyMargin;
                 }
                 
                 remainingPrincipal -= currentMonthlyPrincipal;
+                totalActualPayment += currentPayment;
+                totalMargin += roundedMonthlyMargin;
                 
                 schedule.push({
                     month: month,
-                    payment: monthlyPayment,
+                    payment: currentPayment,
                     principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
                     remaining: Math.max(0, remainingPrincipal)
@@ -332,7 +335,7 @@
 
             return {
                 monthlyPayment,
-                totalPayment,
+                totalPayment: totalActualPayment + adminFee,
                 totalMargin,
                 schedule
             };
@@ -344,33 +347,34 @@
             
             // Terapkan pembulatan
             monthlyPayment = roundAmount(monthlyPayment, roundingType);
-            
-            const totalPayment = monthlyPayment * tenor + adminFee;
 
             const schedule = [];
             let remainingPrincipal = principal;
             let totalMargin = 0;
+            let totalActualPayment = 0;
 
             for (let month = 1; month <= tenor; month++) {
                 const monthlyMargin = remainingPrincipal * monthlyRate;
                 let monthlyPrincipal = monthlyPayment - monthlyMargin;
+                let currentPayment = monthlyPayment;
                 
                 // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
                 if (month === tenor) {
                     monthlyPrincipal = remainingPrincipal;
+                    currentPayment = monthlyPrincipal + monthlyMargin;
                 }
                 
                 // Bulatkan komponen individual
                 const roundedMonthlyMargin = roundAmount(monthlyMargin, roundingType);
-                const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
                 
                 remainingPrincipal -= monthlyPrincipal;
                 totalMargin += monthlyMargin;
+                totalActualPayment += currentPayment;
 
                 schedule.push({
                     month: month,
-                    payment: monthlyPayment,
-                    principal: month === tenor ? monthlyPrincipal : roundedMonthlyPrincipal,
+                    payment: currentPayment,
+                    principal: monthlyPrincipal,
                     margin: roundedMonthlyMargin,
                     remaining: Math.max(0, remainingPrincipal)
                 });
@@ -378,7 +382,7 @@
 
             return {
                 monthlyPayment,
-                totalPayment,
+                totalPayment: totalActualPayment + adminFee,
                 totalMargin,
                 schedule
             };
@@ -389,6 +393,7 @@
             const schedule = [];
             let remainingPrincipal = principal;
             let totalMargin = 0;
+            let totalActualPayment = 0;
             const monthlyPrincipal = principal / tenor;
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipal, roundingType);
 
@@ -409,6 +414,7 @@
                 
                 remainingPrincipal -= currentMonthlyPrincipal;
                 totalMargin += monthlyMargin;
+                totalActualPayment += monthlyPayment;
 
                 schedule.push({
                     month: month,
@@ -419,12 +425,11 @@
                 });
             }
 
-            const averageMonthlyPayment = (principal + totalMargin) / tenor;
-            const totalPayment = principal + totalMargin + adminFee;
+            const averageMonthlyPayment = totalActualPayment / tenor;
 
             return {
                 monthlyPayment: roundAmount(averageMonthlyPayment, roundingType),
-                totalPayment,
+                totalPayment: totalActualPayment + adminFee,
                 totalMargin,
                 schedule
             };
@@ -438,8 +443,6 @@
             
             // Terapkan pembulatan
             monthlyPayment = roundAmount(monthlyPayment, roundingType);
-            
-            const totalPayment = totalAmount + adminFee;
 
             const schedule = [];
             let remainingPrincipal = principal;
@@ -448,20 +451,24 @@
             
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipalPayment, roundingType);
             const roundedMonthlyMargin = roundAmount(monthlyMarginPayment, roundingType);
+            let totalActualPayment = 0;
 
             for (let month = 1; month <= tenor; month++) {
                 let currentMonthlyPrincipal = roundedMonthlyPrincipal;
+                let currentPayment = monthlyPayment;
                 
                 // Pada angsuran terakhir, gunakan sisa saldo sebagai pokok
                 if (month === tenor) {
                     currentMonthlyPrincipal = remainingPrincipal;
+                    currentPayment = currentMonthlyPrincipal + roundedMonthlyMargin;
                 }
                 
                 remainingPrincipal -= currentMonthlyPrincipal;
+                totalActualPayment += currentPayment;
                 
                 schedule.push({
                     month: month,
-                    payment: monthlyPayment,
+                    payment: currentPayment,
                     principal: currentMonthlyPrincipal,
                     margin: roundedMonthlyMargin,
                     remaining: Math.max(0, remainingPrincipal)
@@ -470,7 +477,7 @@
 
             return {
                 monthlyPayment,
-                totalPayment,
+                totalPayment: totalActualPayment + adminFee,
                 totalMargin,
                 schedule
             };
@@ -512,6 +519,7 @@
             const schedule = [];
             let bankOwnership = principal;
             let totalMargin = 0;
+            let totalActualPayment = 0;
             const monthlyPrincipalBuyout = principal / tenor;
             const roundedMonthlyPrincipal = roundAmount(monthlyPrincipalBuyout, roundingType);
 
@@ -532,6 +540,7 @@
                 
                 bankOwnership -= currentMonthlyPrincipal;
                 totalMargin += monthlyRent;
+                totalActualPayment += monthlyPayment;
 
                 schedule.push({
                     month: month,
@@ -542,12 +551,11 @@
                 });
             }
 
-            const totalPayment = principal + totalMargin + adminFee;
-            const averageMonthlyPayment = roundAmount((principal + totalMargin) / tenor, roundingType);
+            const averageMonthlyPayment = totalActualPayment / tenor;
 
             return {
-                monthlyPayment: averageMonthlyPayment,
-                totalPayment,
+                monthlyPayment: roundAmount(averageMonthlyPayment, roundingType),
+                totalPayment: totalActualPayment + adminFee,
                 totalMargin,
                 schedule
             };
@@ -621,7 +629,7 @@
 
             // Scroll ke hasil
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-       // }
+        }
 
         // Auto-fill contoh data saat halaman dimuat
         window.addEventListener('load', function() {
