@@ -601,35 +601,7 @@
 
             // Scroll ke hasil
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }d('monthlyPayment').textContent = formatCurrency(result.monthlyPayment);
-            document.getElementById('totalPayment').textContent = formatCurrency(result.totalPayment);
-            document.getElementById('totalProfit').textContent = formatCurrency(result.totalMargin);
-            document.getElementById('principalAmount').textContent = formatCurrency(principal);
-
-            // Tampilkan jadwal angsuran
-            const scheduleTable = document.getElementById('scheduleTable');
-            scheduleTable.innerHTML = '';
-
-            result.schedule.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50';
-                row.innerHTML = `
-                    <td class="p-3 font-medium">${item.month}</td>
-                    <td class="p-3 text-right">${formatCurrency(item.payment)}</td>
-                    <td class="p-3 text-right">${formatCurrency(item.principal)}</td>
-                    <td class="p-3 text-right">${formatCurrency(item.margin)}</td>
-                    <td class="p-3 text-right">${formatCurrency(item.remaining)}</td>
-                `;
-                scheduleTable.appendChild(row);
-            });
-
-            // Tampilkan section hasil
-            document.getElementById('results').classList.remove('hidden');
-            document.getElementById('scheduleContainer').classList.remove('hidden');
-
-            // Scroll ke hasil
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-      //  }
+        }
 
         // Auto-fill contoh data saat halaman dimuat
         window.addEventListener('load', function() {
