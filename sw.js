@@ -1,6 +1,6 @@
 const CACHE_NAME = 'simulasi-pembiayaan-v1';
 const urlsToCache = [
-  '/',
+  '/simulasipembiayaan',
   '/index.html',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
